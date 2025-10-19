@@ -7,7 +7,7 @@
 On synthetic data we observe Pearson \(r\approx 0.53\), ROC-AUC \(\approx 0.89\) for edge detection.
 
 <p align="center">
-  <img src="cr_results/bridge_scatter.png" width="480" alt="Bridge scatter: A_eff vs -J_ref">
+  <img src="docs/bridge_scatter.png" width="480" alt="Bridge scatter: A_eff vs -J_ref">
 </p>
 
 ---
