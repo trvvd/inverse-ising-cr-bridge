@@ -47,13 +47,6 @@ make A     # Part A: writes results/results_core.npz (+ PNGs)
 make B     # Part B: reads results_core.npz (n_species), writes results/J_target_from_CR.npz
 
 
-
-
-make setup
-make A     # Part A: writes results/results_core.npz (+ PNGs)
-make B     # Part B: reads results_core.npz (n_species), writes results/J_target_from_CR.npz
-
-
 inverse-ising-cr-bridge/
 ├─ README.md
 ├─ requirements.txt
