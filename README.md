@@ -1,20 +1,23 @@
 # Inverse Ising ↔ Consumer–Resource: an unsupervised stat-mech bridge
 
 **TL;DR**  
-A) **Inverse Ising (pseudo-likelihood)** recovers pairwise couplings `J` from samples using node-wise logistic regressions with L1+CV.  
-B) **Consumer–Resource (MacArthur)** learns preferences `C` and maintenance costs `m` from time series and evaluates feasibility & stability.  
-**Bridge)** The effective competition \(A_{\text{eff}} = C D^{-1} C^\top\) **predicts** Ising couplings: we observe ROC-AUC ≈ **0.89** on synthetic data.
+**A)** *Inverse Ising (pseudo-likelihood)* recovers pairwise couplings \(J\) from binary snapshots using node-wise logistic regressions with L1-CV.  
+**B)** *Consumer–Resource (MacArthur)* learns preferences \(C\) and maintenance \(m\) from time series and checks feasibility & stability.  
+**Bridge.** The *effective competition* \(A_{\mathrm{eff}} = C\,D^{-1}C^\top\) predicts Ising couplings via \(J \approx -\kappa\,A_{\mathrm{eff}}\).  
+On synthetic data we observe Pearson \(r\approx 0.53\), ROC-AUC \(\approx 0.89\) for edge detection.
 
 <p align="center">
-  <img src="docs/bridge_scatter.png" width="420" alt="Bridge scatter"/>
+  <img src="cr_results/bridge_scatter.png" width="480" alt="Bridge scatter: A_eff vs -J_ref">
 </p>
 
 ---
 
 ## 1. Motivation
 
-Pairwise graphical models are powerful but phenomenological; mechanistic ecological models (MacArthur CR) are interpretable but require dynamics. This repo demonstrates both ends **and** an interpretable **bridge**:
-- from dynamics → preferences \((C,m)\) → **effective competition** \(A_{\text{eff}}\),
+Pairwise graphical models are powerful but phenomenological; mechanistic ecological models (MacArthur CR) are interpretable but require dynamics.  
+This repo demonstrates both ends and an interpretable **bridge**:
+
+- from **dynamics** → **preferences** \((C,m)\) → **effective competition** \(A_{\mathrm{eff}}\),
 - which aligns with **pairwise couplings** \(J\) inferred from snapshots.
 
 ---
@@ -22,42 +25,35 @@ Pairwise graphical models are powerful but phenomenological; mechanistic ecologi
 ## 2. What’s inside
 
 ### Part A — Inverse Ising (pseudo-likelihood)
-- Node-wise logistic regressions (`SAGA`, `L1`, `LogisticRegressionCV`) with hold-out conditional log-loss.
+
+- Node-wise logistic regressions (**SAGA**, \(\ell_1\)): `LogisticRegressionCV` with hold-out conditional log-loss.
 - Gibbs sampling to generate synthetic snapshots.
-- Recovery metrics: Pearson correlation (upper-tri), ROC-AUC / PR-AUC for edge detection, MSE, sign accuracy, asymmetry of raw coefficients.
-- Ablations over sample size, density, and inverse temperature \( \beta \).
+- Recovery metrics: Pearson correlation (upper-tri), ROC-AUC / PR-AUC (edge detection), MSE, sign accuracy, asymmetry of raw coefficients.
+- Optional ablations over sample size, density, inverse temperature \(\beta\).
 
 ### Part B — Consumer–Resource (MacArthur)
-- ODE simulation via `solve_ivp` under multiple resource inflow profiles.
-- Linearized regression \((\dot n_i/n_i = C_i \cdot R - m_i)\): `LassoCV(positive=True)` → NNLS refinement.
-- Feasibility & steady-state checks (residuals); **stability** via Jacobian eigen-spectra.
-- Robustness to measurement noise; sample-complexity wrt #experiments and time resolution.
 
-### Bridge — \(A_{\text{eff}}\) ↔ \(J\)
-- Build \(A_{\text{eff}}(Ĉ) = Ĉ D^{-1} Ĉ^\top\); compare to \(-J_{\text{ref}}\) (either `J_true` exported from CR or `J_hat` from inverse Ising).
-- Report correlation & ROC/PR; estimate scale \( \kappa \) in \( J \approx -\kappa A_{\text{eff}} \).
+We simulate
+\[
+\dot R = s - d\circ R - R\circ (C^\top n), \qquad 
+\dot n = n\circ(CR - m),
+\]
+build per-species regressions for \( \frac{1}{n_i}\frac{dn_i}{dt} \approx C_i\cdot R - m_i \),
+fit **LassoCV** (`positive=True`) for \(C\) and \(m\), and optionally NNLS-refine \(C\) at fixed \(\hat m\).
+We then:
+- check feasibility (fraction \(n_i>0\) at steady state) and stationarity residuals,
+- assess local stability via Jacobian eigen-spectrum.
+
+### Bridge — \(A_{\mathrm{eff}}(C) \leftrightarrow J\)
+
+- Build \(A_{\mathrm{eff}} = C D^{-1} C^\top\); compare to \(-J_{\text{ref}}\) (either `J_true` exported from CR or `J_hat` from inverse Ising).
+- Report correlation & ROC/PR; estimate scale \(\kappa\) in \(J \approx -\kappa A_{\mathrm{eff}}\).
 
 ---
 
 ## 3. Quick start
 
+### Environment
 ```bash
-make setup
-make A     # Part A: writes results/results_core.npz (+ PNGs)
-make B     # Part B: reads results_core.npz (n_species), writes results/J_target_from_CR.npz
-
-
-inverse-ising-cr-bridge/
-├─ README.md
-├─ requirements.txt
-├─ .gitignore
-├─ Makefile
-├─ src/
-│  └─ bridge/
-│     ├─ inverse_ising.py          # Part A (final script)
-│     ├─ consumer_resource.py      # Part B (final script)
-│     └─ __init__.py
-├─ notebooks/
-│  └─ B_consumer_resource.ipynb    # Part B notebook
-├─ results/                        # Part A artifacts & bridge npz/png
-└─ cr_results/                     # Part B artifacts & bridge plots
+python -m venv .venv && source .venv/bin/activate   # or conda create -n ising-cr python=3.10
+pip install -r requirements.txt
