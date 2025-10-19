@@ -6,7 +6,7 @@ B) **Consumer–Resource (MacArthur)** learns preferences `C` and maintenance co
 **Bridge)** The effective competition \(A_{\text{eff}} = C D^{-1} C^\top\) **predicts** Ising couplings: we observe ROC-AUC ≈ **0.89** on synthetic data.
 
 <p align="center">
-  <img src="docs/images/bridge_scatter.png" width="420" alt="Bridge scatter"/>
+  <img src="docs/bridge_scatter.png" width="420" alt="Bridge scatter"/>
 </p>
 
 ---
