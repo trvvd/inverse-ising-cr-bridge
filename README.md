@@ -65,7 +65,6 @@ inverse-ising-cr-bridge/
 │     ├─ consumer_resource.py      # Part B (final script)
 │     └─ __init__.py
 ├─ notebooks/
-│  ├─ A_inverse_ising_pl.ipynb     # Part A notebook
 │  └─ B_consumer_resource.ipynb    # Part B notebook
 ├─ results/                        # Part A artifacts & bridge npz/png
 └─ cr_results/                     # Part B artifacts & bridge plots
