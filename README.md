@@ -1,10 +1,20 @@
-# inverse-ising-cr-bridge
-Inverse Ising (pseudo-likelihood) — node-wise L1+CV, Gibbs sampling, ROC/PR, conditional log-loss, ablations. Consumer–Resource (MacArthur) — infer Cm from ODE time series (Lasso→NNLS), stability via Jacobian spectra. Bridge: effective competition predicts Ising couplings (ROC-AUC ≈ 0.89).
+# Inverse Ising ↔ Consumer–Resource: an unsupervised stat-mech bridge
+
+**TL;DR**  
+A) **Inverse Ising (pseudo-likelihood)** recovers pairwise couplings `J` from samples (node-wise logistic regressions with L1+CV).  
+B) **Consumer–Resource (MacArthur)** learns preferences `C` and maintenance costs `m` from time series, then checks feasibility & stability.  
+**Bridge)** The effective competition \(A_{\text{eff}} = C D^{-1} C^\top\) **predicts** Ising couplings: ROC-AUC ≈ 0.89 on synthetic data.
+
+## Repro
+```bash
+
+make setup
+make A     # Part A: writes results/results_core.npz (+ PNGs)
+make B     # Part B: reads results_core.npz (n_species), writes results/J_target_from_CR.npz
 
 
 inverse-ising-cr-bridge/
 ├─ README.md
-├─ LICENSE
 ├─ requirements.txt
 ├─ .gitignore
 ├─ Makefile
