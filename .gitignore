@@ -1,0 +1,17 @@
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# jupyter
+.ipynb_checkpoints/
+
+# run artifacts
+results/
+cr_results/
+
+# OS
+.DS_Store
